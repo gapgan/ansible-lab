@@ -34,3 +34,20 @@ ansible_httpapi_pass: !vault |
 #   ansible-vault encrypt_string 'text'
 # Direct copy the hash output to yaml vars entry as above
 
+
+# Below is another way with password prompt
+# need to comment out "vault_password_file=~/.vault_pass" in ansible.cfg
+# create vault password file by [echo "<syna_default_password>" > ~/.vault_pass_syna]
+# ansible-vault encrypt_string --vault-id adminotan@~/.vault_pass_syna '<admin AD password>' --name 'ansible_password'
+# run ansible-playbook with "--ask-vault-password"
+# example "ansible-playbook ./yml/01_reports.yml --ask-vault-password"
+# https://docs.ansible.com/ansible/latest/network/getting_started/first_inventory.html
+
+# ansible_user: adminotan
+# ansible_password: !vault |
+#           $ANSIBLE_VAULT;1.2;AES256;adminotan
+#           37656639623766396662653238303331656335326361363630653030373234373039303532323131
+#           6331646265316430393836306130373132396261306231390a376264356664663935353132656638
+#           61313236303133653835343863363630333761393335653035333339343834653166306339336534
+#           6235383735376235350a366561653664313365373339353937626130393737393935653065613865
+#           6161
