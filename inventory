@@ -1,0 +1,86 @@
+# ------------- Hierarchy ------------- #
+[network:children]                  
+eos
+ios
+junos
+
+[eos:children]
+eos_csw
+eos_esw
+
+[ios:children]
+ios_csw
+ios_esw
+
+[junos:children]
+junos_igw
+junos_wgw
+
+# ------------- EOS - Arista ------------- #
+[eos_csw]
+
+[eos_esw]
+sha2-dc-tor4        ansible_host=10.70.14.13
+
+# ------------- IOS - Cisco ------------- #
+[ios_esw]
+tpe6-f31-test-sw    ansible_host=10.114.200.14
+
+[ios_csw]
+
+[ios_rtr]
+
+# ------------- JUNOS - Juniper ------------- #
+[junos_igw]
+hkg3-igw1           ansible_host=10.242.200.7
+; nak-igw1          ansible_host=10.42.0.9
+; sjc-igw1          ansible_host=10.20.14.211
+; sjc-igw2          ansible_host=10.20.14.212
+; ty4-igw1          ansible_host=205.175.208.1
+; tpe6-igw1         ansible_host=10.114.200.17
+
+[junos_wgw]
+; atl-wgw1          ansible_host=10.30.188.1
+; atl-wgw2          ansible_host=10.30.188.2
+; bei2-wgw1         ansible_host=10.43.0.1
+; bei2-wgw2         ansible_host=10.43.0.2
+; bei4-wgw1         ansible_host=10.13.0.1
+; bei4-wgw2         ansible_host=10.13.0.2
+; blr1-wgw2         ansible_host=10.45.0.2
+; blr1-wgw3         ansible_host=10.45.0.9
+; blr3-wgw1         ansible_host=10.245.0.1
+; blr3-wgw2         ansible_host=10.245.0.2
+; cbg-wgw1          ansible_host=10.250.0.1
+; cbg-wgw2          ansible_host=10.250.0.2
+; che-wgw2          ansible_host=10.47.0.2
+; hkg2-igw1         ansible_host=10.244.200.9
+; hkg2-wgw1         ansible_host=10.244.0.1
+; hkg2-wgw2         ansible_host=10.244.0.2
+hkg3-wgw2           ansible_host=10.242.0.2
+; hsi-wgw1          ansible_host=10.31.0.1
+; hsi-wgw2          ansible_host=10.31.0.2
+; hyd-wgw1          ansible_host=10.112.0.1
+; hyd-wgw3          ansible_host=10.112.0.9
+; icn2-wgw1         ansible_host=10.28.0.1
+; icn2-wgw2         ansible_host=10.28.0.2
+; irv-1929-igw1     ansible_host=10.25.167.2
+; irv-wgw1          ansible_host=10.25.188.1
+; irv-wgw2          ansible_host=10.25.250.5
+; ktw-wgw1          ansible_host=10.249.0.1
+; ktw-wgw2          ansible_host=10.249.0.2
+; nak-wgw1          ansible_host=10.42.0.8
+; nbg-wgw1          ansible_host=10.246.0.1
+; nbg-wgw2          ansible_host=10.246.0.2
+; seo-wgw1          ansible_host=10.32.0.1
+; seo-wgw2          ansible_host=10.32.0.2
+; sha2-wgw2         ansible_host=10.70.0.2
+; sha2-wgw3         ansible_host=10.70.0.9
+; she-wgw1          ansible_host=10.18.0.1
+; she-wgw2          ansible_host=10.18.0.2
+; sjc-wgw1          ansible_host=10.20.0.101
+; sjc-wgw2          ansible_host=10.20.0.102
+; tpe6-wgw1         ansible_host=10.114.0.1
+; tpe6-wgw2         ansible_host=10.114.0.2
+; ty4-wgw1          ansible_host=10.110.0.1
+; ty4-wgw3          ansible_host=10.110.0.9
+

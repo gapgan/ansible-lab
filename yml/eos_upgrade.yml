@@ -1,0 +1,76 @@
+- name: Upgrade an Arista EOS Switch
+  hosts: leafs
+
+  tasks:
+  - name: Enable eAPI with HTTPS
+    eos_eapi:
+     state: started
+     http: no
+     https_port: 443
+     local_http: no
+     local_http_port: 80
+     socket: no
+     provider: "{{cli}}"
+    tags: always
+
+  - name: GATHERING FACTS
+    eos_facts:
+       gather_subset: hardware
+       provider: "{{cli}}"
+    tags: always
+
+  - name: COPYING IMAGE TO DEVICE FLASH
+    ntc_file_copy:
+      platform: arista_eos_eapi
+      local_file: images/{{ new_image }}
+      host: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      transport: https
+    when: ansible_net_version != "{{version}}"
+    tags: copy
+
+  - name: SETTING BOOT IMAGE
+    eos_config:
+       lines:
+         - boot system flash:{{new_image}}
+       provider: "{{cli}}"
+       host: "{{ inventory_hostname }}"
+    when: ansible_net_version != "{{version}}"
+    tags: install
+
+  - name: SAVING CONFIGS
+    ntc_save_config:
+        platform: arista_eos_eapi
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        local_file: backup/{{ inventory_hostname }}.cfg
+        transport: https
+    when: ansible_net_version != "{{version}}"
+    tags: backup
+
+  - name: RELOADING THE DEVICE
+    ntc_reboot:
+      platform: arista_eos_eapi
+      confirm: true
+      host: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      transport: https
+    when: ansible_net_version != "{{version}}"
+    tags: reload
+
+  - name: VERIFYING CONNECTIVITY
+    wait_for:
+         port: 22
+         host: "{{inventory_hostname}}"
+         timeout: 300
+  - eos_command:
+        commands: ping 192.168.1.1
+        provider: "{{cli}}"
+        wait_for:
+         - result[0] contains "ping statistics"
+    register: result
+    failed_when: "not '0% packet loss' in result.stdout[0]"
+    tags: verify

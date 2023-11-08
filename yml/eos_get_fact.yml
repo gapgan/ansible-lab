@@ -1,0 +1,29 @@
+---
+
+  - name: GATHER FACTS FROM CISCO DEVICES
+    hosts: eos
+    connection: local
+    gather_facts: no
+
+    tasks:
+
+      - name: Gather info from Show Version
+        eos_command:
+          commands:
+            - show version
+        register: output
+             
+      - name: Display version
+        debug:
+          var: output.stdout_lines[0]
+      
+      - name: GATHERING FACTS
+        eos_facts:
+          gather_subset: 
+            - hardware
+        register: facts
+
+      - name: Display output
+        debug:
+          msg: "Model is {{facts.ansible_facts.ansible_net_model}} and it is running {{facts.ansible_facts.ansible_net_version}}"
+          

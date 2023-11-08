@@ -1,0 +1,16 @@
+---
+
+  - name: MANAGE ACLS
+    hosts: ios
+    connection: network_cli
+    gather_facts: no
+
+    tasks:
+
+      - name: Configure ACL on IOSXE
+        ios_config:
+          parents: ip access-list extended Ansible_testlab
+          commands:
+            - permit ip host 172.16.1.1 any log
+          before: no ip access-list extended Ansible_testlab
+          match: exact

@@ -1,0 +1,14 @@
+---
+
+  - name: PLAY 1 - UPDATE SNMP CONFIGURATION
+    hosts: ios
+    connection: network_cli
+    gather_facts: no
+
+    tasks:
+
+      - name: TASK 1 - LIST OF COMMANDS
+        ios_config:
+          commands:
+            - snmp-server location TPE6
+            - snmp-server contact it-network@synaptics.com

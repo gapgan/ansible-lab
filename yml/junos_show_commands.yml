@@ -1,0 +1,42 @@
+---
+- name: gather information from routers
+  hosts: junos
+  gather_facts: no
+  connection: network_cli
+  # vars_files: ~/devops/groups_vars/junos.yml
+
+  tasks:
+    - name: gather router dhcp facts
+      cli_command:
+        command: "show configuration system | display set | match dhcp"
+      register: output
+
+    - name: display facts
+      debug:
+        msg: "{{ output.stdout }}"
+
+    # - name: STORE DATA IN A FILE
+    #   copy:
+    #     content: "{{ output.stdout }}"
+    #     dest: ./outputs/{{ inventory_hostname }}_dhcp.txt
+    #     follow: no
+
+    - name: gather router web facts
+      cli_command:
+        command: "show configuration system | display set | match web"
+      register: output2
+
+    - name: display facts
+      debug:
+        msg: "{{ output2.stdout }}"
+
+    # - name: STORE DATA IN A FILE
+    #   copy:
+    #     content: " {{ output2.stdout }}"
+    #     dest: ./outputs/{{ inventory_hostname }}_web.txt
+    #     follow: no
+
+
+
+
+
