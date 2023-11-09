@@ -27,7 +27,7 @@
 
     - name: Facts from a specific host
       debug:
-        var: hostvars['sha2-dc-tor4']
+        var: hostvars['tpe6-igw1']
 
     - name: Write facts to disk using a template
       copy:
@@ -66,14 +66,30 @@
     - name: Backup switch (eos)
       arista.eos.eos_config:
         backup: yes
+        backup_options:
+          dir_path: /tmp/backups/{{ inventory_hostname }}/
       register: backup_eos_location
       when: ansible_network_os == 'arista.eos.eos'
 
     - name: backup switch (junos)
       junipernetworks.junos.junos_config:
         backup: yes
+        backup_options:
+          dir_path: /tmp/backups/{{ inventory_hostname }}/
       register: backup_junos_location
       when: ansible_network_os == 'junipernetworks.junos.junos'
+
+    - name: backup switch (ios)
+      cisco.ios.ios_config:
+        backup: yes
+        backup_options:
+          dir_path: /tmp/backups/{{ inventory_hostname }}/
+      register: backup_ios_location
+      when: ansible_network_os == 'cisco.ios.ios'
+    
+    # - name: Display backup_ios_location
+    #   debug:
+    #     var: backup_ios_location
 
     - name: Create backup dir
       file:
@@ -81,14 +97,20 @@
         state: directory
         recurse: yes
 
-    - name: Copy backup files into /tmp/backups/ (eos)
-      copy:
-        src: "{{ backup_eos_location.backup_path }}"
-        dest: "/tmp/backups/{{ inventory_hostname }}/{{ inventory_hostname }}.bck"
-      when: ansible_network_os == 'arista.eos.eos'
+    # - name: Copy backup files into /tmp/backups/ (eos)
+    #   copy:
+    #     src: "{{ backup_eos_location.backup_path }}"
+    #     dest: "/tmp/backups/{{ inventory_hostname }}/{{ inventory_hostname }}.bck"
+    #   when: ansible_network_os == 'arista.eos.eos'
 
-    - name: Copy backup files into /tmp/backups/ (junos)
-      copy:
-        src: "{{ backup_junos_location.backup_path }}"
-        dest: "/tmp/backups/{{ inventory_hostname }}/{{ inventory_hostname }}.bck"
-      when: ansible_network_os == 'junipernetworks.junos.junos'
+    # - name: Copy backup files into /tmp/backups/ (junos)
+    #   copy:
+    #     src: "{{ backup_junos_location.backup_path }}"
+    #     dest: "/tmp/backups/{{ inventory_hostname }}/{{ inventory_hostname }}.bck"
+    #   when: ansible_network_os == 'junipernetworks.junos.junos'
+
+    # - name: Copy backup files into /tmp/backups/ (ios)
+    #   copy:
+    #     src: "{{ backup_ios_location.backup_path }}"
+    #     dest: "/tmp/backups/{{ inventory_hostname }}/{{ inventory_hostname }}.bck"
+    #   when: ansible_network_os == 'cisco.ios.ios'
