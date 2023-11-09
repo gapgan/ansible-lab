@@ -10,12 +10,12 @@
       - name: Gather info from Show Version
         eos_command:
           commands:
-            - show version
+            - show version | json
         register: output
              
       - name: Display version
         debug:
-          var: output.stdout_lines[0]
+          var: output.stdout[0]["version"]
       
       - name: GATHERING FACTS
         eos_facts:
