@@ -34,27 +34,33 @@
         content: |
           #jinja2: lstrip_blocks: True
           EOS device info:
+          
             {% for host in groups['eos'] %}
             Hostname: {{ hostvars[host].ansible_net_hostname }}
-            Version: {{ hostvars[host].ansible_net_version }}
-            Model: {{ hostvars[host].ansible_net_model }}
-            Serial: {{ hostvars[host].ansible_net_serialnum }}
+            Version:  {{ hostvars[host].ansible_net_version }}
+            Model:    {{ hostvars[host].ansible_net_model }}
+            Serial:   {{ hostvars[host].ansible_net_serialnum }}
+            ----------------------
             {% endfor %}
 
           IOS device info:
+
             {% for host in groups['ios'] %}
             Hostname: {{ hostvars[host].ansible_net_hostname }}
-            Version: {{ hostvars[host].ansible_net_version }}
-            Model: {{ hostvars[host].ansible_net_model }}
-            Serial: {{ hostvars[host].ansible_net_serialnum }}
+            Version:  {{ hostvars[host].ansible_net_version }}
+            Model:    {{ hostvars[host].ansible_net_model }}
+            Serial:   {{ hostvars[host].ansible_net_serialnum }}
+            ----------------------
             {% endfor %}
 
           junos device info:
+
             {% for host in groups['junos'] %}
             Hostname: {{ hostvars[host].ansible_net_hostname }}
-            Version: {{ hostvars[host].ansible_net_version }}
-            Model: {{ hostvars[host].ansible_net_model }}
-            Serial: {{ hostvars[host].ansible_net_serialnum }}
+            Version:  {{ hostvars[host].ansible_net_version }}
+            Model:    {{ hostvars[host].ansible_net_model }}
+            Serial:   {{ hostvars[host].ansible_net_serialnum }}
+            ----------------------
             {% endfor %}
         dest: /tmp/switch-facts
       run_once: yes
