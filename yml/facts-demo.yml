@@ -65,6 +65,30 @@
         dest: /tmp/switch-facts
       run_once: yes
 
+    - name: Write facts to disk using a template (CSV forma)
+      copy:
+        content: |
+          #jinja2: lstrip_blocks: True
+          EOS device info:
+            Hostname;Version;Model;Serial;
+            {% for host in groups['eos'] %}
+            {{ hostvars[host].ansible_net_hostname }};{{ hostvars[host].ansible_net_version }};{{ hostvars[host].ansible_net_model }};{{ hostvars[host].ansible_net_serialnum }}
+            {% endfor %}
+
+          IOS device info:
+            treeHostname;Version;Model;Serial;
+            {% for host in groups['eos'] %}
+            {{ hostvars[host].ansible_net_hostname }};{{ hostvars[host].ansible_net_version }};{{ hostvars[host].ansible_net_model }};{{ hostvars[host].ansible_net_serialnum }}
+            {% endfor %}
+
+          junos device info:
+            Hostname;Version;Model;Serial;
+            {% for host in groups['eos'] %}
+            {{ hostvars[host].ansible_net_hostname }};{{ hostvars[host].ansible_net_version }};{{ hostvars[host].ansible_net_model }};{{ hostvars[host].ansible_net_serialnum }}
+            {% endfor %}
+        dest: /tmp/switch-facts-csv
+      run_once: yes
+
     ###
     # Get running configuration
     #
