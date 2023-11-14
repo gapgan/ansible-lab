@@ -8,14 +8,20 @@
     #
     - name: Gather facts (eos)
       arista.eos.eos_facts:
+        gather_subset:
+        - min
       when: ansible_network_os == 'arista.eos.eos'
 
     - name: Gather facts (ios)
       cisco.ios.ios_facts:
+        gather_subset:
+        - min
       when: ansible_network_os == 'cisco.ios.ios'
 
     - name: Gather facts (junos)
       junipernetworks.junos.junos_facts:
+        gather_subset:
+        - min
       when: ansible_network_os == 'junipernetworks.junos.junos'
 
     ###
@@ -25,9 +31,9 @@
       debug:
         msg: "The hostname is {{ ansible_net_hostname }} and the OS is {{ ansible_net_version }}"
 
-    - name: Facts from a specific host
-      debug:
-        var: hostvars['tpe6-igw1']
+    # - name: Facts from a specific host
+    #   debug:
+    #     var: hostvars['tpe6-f31-test-sw']
 
     - name: Write facts to disk using a template
       copy:
@@ -65,7 +71,7 @@
         dest: /tmp/switch-facts
       run_once: yes
 
-    - name: Write facts to disk using a template (CSV forma)
+    - name: Write facts to disk using a template (CSV format)
       copy:
         content: |
           #jinja2: lstrip_blocks: True
@@ -76,14 +82,14 @@
             {% endfor %}
 
           IOS device info:
-            treeHostname;Version;Model;Serial;
-            {% for host in groups['eos'] %}
+            Hostname;Version;Model;Serial;
+            {% for host in groups['ios'] %}
             {{ hostvars[host].ansible_net_hostname }};{{ hostvars[host].ansible_net_version }};{{ hostvars[host].ansible_net_model }};{{ hostvars[host].ansible_net_serialnum }}
             {% endfor %}
 
           junos device info:
             Hostname;Version;Model;Serial;
-            {% for host in groups['eos'] %}
+            {% for host in groups['junos'] %}
             {{ hostvars[host].ansible_net_hostname }};{{ hostvars[host].ansible_net_version }};{{ hostvars[host].ansible_net_model }};{{ hostvars[host].ansible_net_serialnum }}
             {% endfor %}
         dest: /tmp/switch-facts-csv
@@ -92,6 +98,12 @@
     ###
     # Get running configuration
     #
+
+    - name: Create backup dir
+      file:
+        path: "/tmp/backups/{{ inventory_hostname }}"
+        state: directory
+        recurse: yes
 
     - name: Backup switch (eos)
       arista.eos.eos_config:
@@ -120,12 +132,6 @@
     # - name: Display backup_ios_location
     #   debug:
     #     var: backup_ios_location
-
-    - name: Create backup dir
-      file:
-        path: "/tmp/backups/{{ inventory_hostname }}"
-        state: directory
-        recurse: yes
 
     # - name: Copy backup files into /tmp/backups/ (eos)
     #   copy:
