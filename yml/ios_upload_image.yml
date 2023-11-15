@@ -1,0 +1,96 @@
+---
+
+# Ansible Playbook to upload new Cisco IOS
+# Only upload file if the current IOS version is different
+
+- name: Upload new CISCO IOS files
+  hosts: ios_esw
+  gather_facts: no
+
+  vars:
+    new_version: 15.2(7)E6                          # Update the target version 
+    new_image: c2960x-universalk9-tar.152-7.E6.tar  # Update the target image
+    file_size: 40580                                # Update the size in kB
+    md5_value: 41d8fa600041e14e59d51fedd246daf2     # copy from portal or md5sum
+    
+  tasks:
+    - name: CHECK CURRENT VERSION
+      ios_facts:
+        gather_subset: hardware
+
+    # - debug:
+    #     msg:
+    #     - "Current version is {{ ansible_net_version }}"
+    #     - "Upgrade image is {{ new_version }}"
+
+    - name: SET VARIABLES FOR DEVICE FILE SYSTEMS
+      set_fact:
+        free_space: "{{ansible_net_filesystems_info['flash:']['spacefree_kb']}}"
+        file_destination: "{{ ansible_net_filesystems[0] + new_image }}"
+
+    # - debug:
+    #     msg: "AVAILABLE FREE MEMORY SPACE = {{ free_space }} kb"
+
+    - name: CONFIRM CURRENT IMAGE ARE DIFFERENT
+      assert:
+        that: "ansible_net_version != new_version"  
+        fail_msg: "FAIL - Unit already at new image"
+        success_msg: "PASS - Unit proceeds upgrade from {{ ansible_net_version }} to {{ new_version }}"
+
+    # - debug:
+    #     msg:
+    #     - "New IOS and current IOS are different."
+ 
+    #   when: ansible_net_version != new_version
+
+    - name: CONFIRM DEVICE HAS ENOUGH FREE MEMORY SPACE BEFORE TRANSFER
+      assert:
+        that: "{{ free_space }} > {{ file_size }}"  # convert to kbps
+        fail_msg: "FAIL - Not enough space available ({{ free_space }} kb) for upload"
+        success_msg: "PASS - Enough space available ({{ free_space }} kb) for upload"
+
+    - name: ACTIVATE CI SCP SERVER FEATURE # Ensure device has the scp feature activated.
+      ios_config:
+        commands: ip scp server enable
+
+    # - debug:
+    #     msg: "UPLOAD DESTINATION = {{ file_destination }}"
+
+    - name: COPY_NEW_IOS_FROM_SCP (10.114.60.13)  # depends on different regions
+      cli_command:                                # username varies with implementor
+         command: 'copy scp://otan:{{ansible_ssh_pass}}@10.114.60.13/images/{{ new_image }} {{ file_destination }}'
+         check_all: True
+         prompt:
+           - 'Destination filename'
+         answer:
+           - '{{ new_image }}'
+      vars:
+        ansible_command_timeout: 1200   # 20 mins and may change accordingly
+
+    # - name: Copy new IOS from ansible controll node to Network devices
+    #   net_put:
+    #     src: '~/images/{{ new_image }}'
+    #     dest: '{{ file_destination }}'
+
+    # - debug:
+    #     msg: "UPLOAD CONFIRMATION-New ios image uploaded successfully."
+
+    - name: PERFORM FILE INTEGRITY CHECKS
+      ios_command:
+        commands: "verify /md5 flash:{{ new_image }}"
+      register: uploaded_file_md5
+      vars:
+        ansible_command_timeout: 300
+    
+    # - name: Display md5
+    #   debug:
+    #     var: uploaded_file_md5
+    
+    - name: CONFIRM THAT FILE MD5 HASH VALUE IS MAINTAINED
+      assert:
+        that: md5_value in uploaded_file_md5['stdout'][0]
+        success_msg: "Success.Uploaded image integrity confirmed"
+        fail_msg: "Fail.Uploaded image integrity failure"
+
+    - debug:
+        msg: "PROCESS COMPLETED.Next steps 1)Change boot sequence. 2)Save running configs 3) Reload device"
