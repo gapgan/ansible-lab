@@ -4,14 +4,14 @@
 # Only upload file if the current IOS version is different
 
 - name: Upload new CISCO IOS files
-  hosts: ios_esw
+  hosts: ios_csw
   gather_facts: no
 
   vars:
-    new_version: 15.2(7)E6                          # Update the target version 
-    new_image: c2960x-universalk9-tar.152-7.E6.tar  # Update the target image
-    file_size: 40580                                # Update the size in kB
-    md5_value: 41d8fa600041e14e59d51fedd246daf2     # copy from portal or md5sum
+    new_version: 16.12.9                              # Update the target version 
+    new_image: cat3k_caa-universalk9.16.12.09.SPA.bin # Update the target image
+    file_size: 471308                                 # Update the size in kB
+    md5_value: d15c50b1e11face0e69b4dc0fba474f8       # copy from portal or md5sum
     
   tasks:
     - name: CHECK CURRENT VERSION
@@ -65,7 +65,7 @@
          answer:
            - '{{ new_image }}'
       vars:
-        ansible_command_timeout: 1200   # 20 mins and may change accordingly
+        ansible_command_timeout: 1800   # 30 mins and may change accordingly
 
     # - name: Copy new IOS from ansible controll node to Network devices
     #   net_put:
