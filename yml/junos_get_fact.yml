@@ -1,0 +1,25 @@
+---
+
+- name: Get Device Facts
+  hosts: junos
+  connection: netconf
+  gather_facts: no
+
+  tasks:
+  - name: Checking NETCONF connectivity
+    wait_for: 
+      host: "{{ inventory_hostname }}"
+      port: 830
+      timeout: 5
+  
+  - name: Retrieve facts from a Junos device
+    connection: netconf
+    junipernetworks.junos.junos_facts:
+      gather_subset:
+      - min
+
+  - name: Print version
+    debug:
+      var: ansible_net_version
+
+

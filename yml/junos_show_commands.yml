@@ -2,18 +2,38 @@
 - name: gather information from routers
   hosts: junos
   gather_facts: no
-  connection: network_cli
-  # vars_files: ~/devops/groups_vars/junos.yml
+  connection: netconf
 
   tasks:
-    - name: gather router dhcp facts
-      cli_command:
-        command: "show configuration system | display set | match dhcp"
-      register: output
+    - name: Get software and uptime information
+      junipernetworks.junos.junos_command:     
+        commands: 
+          - "show configuration"
+        display: set
+        wait_for: 
+        - result[0] contains ntp
+      register: junos_result
 
-    - name: display facts
+    # - name: Print response
+    - set_fact:
+        my_var: "{{junos_result.stdout_lines[0] | community.general.json_query()}}"
+    
+    - name: Print
       debug:
-        msg: "{{ output.stdout }}"
+        var: my_var
+
+
+  # vars_files: ~/devops/groups_vars/junos.yml
+
+  # tasks:
+  #   - name: gather router dhcp facts
+  #     cli_command:
+  #       command: "show configuration system | display set | match dhcp"
+  #     register: output
+
+  #   - name: display facts
+  #     debug:
+  #       msg: "{{ output.stdout }}"
 
     # - name: STORE DATA IN A FILE
     #   copy:
@@ -21,14 +41,14 @@
     #     dest: ./outputs/{{ inventory_hostname }}_dhcp.txt
     #     follow: no
 
-    - name: gather router web facts
-      cli_command:
-        command: "show configuration system | display set | match web"
-      register: output2
+    # - name: gather router web facts
+    #   cli_command:
+    #     command: "show configuration system | display set | match web"
+    #   register: output2
 
-    - name: display facts
-      debug:
-        msg: "{{ output2.stdout }}"
+    # - name: display facts
+    #   debug:
+    #     msg: "{{ output2.stdout }}"
 
     # - name: STORE DATA IN A FILE
     #   copy:

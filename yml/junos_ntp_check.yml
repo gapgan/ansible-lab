@@ -1,0 +1,45 @@
+---
+- name: NTP verification
+  hosts: junos
+  gather_facts: no
+  connection: netconf
+
+  tasks:
+    - name: Get software and uptime information
+      junipernetworks.junos.junos_command:     
+        commands: 
+          - "show configuration"
+        display: set
+        wait_for: 
+        - result[0] contains ntp
+      register: ntp_config
+
+    - name: Print output
+      debug:
+        msg: "{{ ntp_config.stdout }}"
+
+    - name: Check if ntp servers are configured
+      block:
+        - name: Check for NTP servers
+          find:
+            paths: ntp_config.stdout
+            patterns: "server"
+            use_regex: true
+        - name: NTP servers configured
+          fail:
+            msg: "NTP servers not configured"
+      when: "'server' is not absent in ntp_config.stdout"
+        
+
+
+    # - name: Check if ntp update interval is configured
+    #   block:
+    #     - name: Check for update interval
+    #       find:
+    #         paths: "{{ ntp_config.stdout_lines }}"
+    #         patterns: "update"
+    #         use_regex: true
+    #     - name: NTP update interval configured
+    #       fail:
+    #         msg: "NTP update interval not configured"
+    #   when: "'update' is not absent in ntp_config.stdout_lines"
