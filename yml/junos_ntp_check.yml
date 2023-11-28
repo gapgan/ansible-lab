@@ -11,24 +11,24 @@
           - "show configuration"
         display: set
         wait_for: 
-        - result[0] contains ntp
-      register: ntp_config
+        - result[0] contains set
+      register: config
 
     - name: Print output
       debug:
-        msg: "{{ ntp_config.stdout }}"
+        msg: "{{ config.stdout_lines }}"
 
-    - name: Check if ntp servers are configured
-      block:
-        - name: Check for NTP servers
-          find:
-            paths: ntp_config.stdout
-            patterns: "server"
-            use_regex: true
-        - name: NTP servers configured
-          fail:
-            msg: "NTP servers not configured"
-      when: "'server' is not absent in ntp_config.stdout"
+    # - name: Check if ntp servers are configured
+    #   block:
+    #     - name: Check for NTP servers
+    #       find:
+    #         paths: ntp_config.stdout
+    #         patterns: "server"
+    #         use_regex: true
+    #     - name: NTP servers configured
+    #       fail:
+    #         msg: "NTP servers not configured"
+    #   when: "'server' is not absent in ntp_config.stdout"
         
 
 

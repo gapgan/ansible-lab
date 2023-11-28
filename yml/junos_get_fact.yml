@@ -1,25 +1,41 @@
 ---
-
 - name: Get Device Facts
   hosts: junos
-  connection: netconf
+  connection: local
   gather_facts: no
 
   tasks:
-  - name: Checking NETCONF connectivity
-    wait_for: 
-      host: "{{ inventory_hostname }}"
-      port: 830
-      timeout: 5
+    - name: Checking NETCONF connectivity
+      wait_for: 
+        host: "{{ ansible_host }}"
+        port: 830
+        timeout: 5
+           
+
+    - name: Retrieve facts from a Junos device
+      connection: juniper.device.pyez
+      juniper.device.facts:
+        savedir: "/tmp/backups/"
+
+    - name: Print version
+      debug:
+        var: junos.version
+
+
+
+
+
+
+
+
+  # tasks:
+  # - name: Retrieve facts from a Junos device
+  #   connection: netconf
+  #   junipernetworks.junos.junos_facts:
+  #     gather_subset:
+  #     - min
+
+  # - name: Print version
+  #   debug:
+  #     var: ansible_net_version
   
-  - name: Retrieve facts from a Junos device
-    connection: netconf
-    junipernetworks.junos.junos_facts:
-      gather_subset:
-      - min
-
-  - name: Print version
-    debug:
-      var: ansible_net_version
-
-
