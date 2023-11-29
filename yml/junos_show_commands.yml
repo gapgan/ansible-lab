@@ -14,13 +14,18 @@
         - result[0] contains ntp
       register: junos_result
 
-    # - name: Print response
-    - set_fact:
-        my_var: "{{junos_result.stdout_lines[0] | community.general.json_query()}}"
-    
-    - name: Print
+    - name: Print the command 
       debug:
-        var: my_var
+        # msg: "{{ junos_result.stdout_lines }}"
+        msg: "{{ junos_result.stdout_lines[0] | regex_findall('set system ntp server \\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b [a-z]+ ', multiline=True, ignorecase=True) }}"
+
+    # - name: Print response
+    # - set_fact:
+    #     my_var: "{{junos_result.stdout_lines[0] | community.general.json_query()}}"
+    
+    # - name: Print
+    #   debug:
+    #     var: my_var
 
 
   # vars_files: ~/devops/groups_vars/junos.yml

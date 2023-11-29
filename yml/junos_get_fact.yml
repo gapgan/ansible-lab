@@ -1,7 +1,7 @@
 ---
 - name: Get Device Facts
   hosts: junos
-  connection: local
+  connection: juniper.device.pyez
   gather_facts: no
 
   tasks:
@@ -10,18 +10,32 @@
         host: "{{ ansible_host }}"
         port: 830
         timeout: 5
-           
+
+    - name: Create backup dir
+      file:
+        path: "/tmp/backups/{{ inventory_hostname }}"
+        state: directory
+        recurse: yes  
 
     - name: Retrieve facts from a Junos device
-      connection: juniper.device.pyez
       juniper.device.facts:
-        savedir: "/tmp/backups/"
+        savedir: "/tmp/backups/{{ inventory_hostname }}"
+        config_format: "set"
+      register: result
 
     - name: Print version
       debug:
-        var: junos.version
+        var: result.ansible_facts.junos.config
 
-
+    # - name: Get Hardware inventory
+    #   juniper.device.command:
+    #     commands: "show chassis hardware"
+    #     dest_dir: "/tmp/backups/{{ inventory_hostname }}"
+    #   register: hardware
+    
+    # - name: Print HW
+    #   debug:
+    #     var: hardware.stdout_lines
 
 
 

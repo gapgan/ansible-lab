@@ -1,0 +1,21 @@
+---
+- name: gather information from routers
+  hosts: junos
+  gather_facts: no
+  connection: juniper.device.pyez
+  collections:
+  - juniper.device
+
+  tasks:
+    - name: "Execute single command in text format"
+      juniper.device.command:
+        commands:
+          - "show configuration system"
+        formats:
+          - "text"
+      register: result
+
+    - name: Print the command 
+      debug:
+        # msg: "{{ result.stdout_lines }}"
+        msg: "{{ result.stdout_lines | regex_findall('ntp|server \\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b .*\\b', multiline=True, ignorecase=True) }}"
